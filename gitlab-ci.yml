@@ -1,0 +1,49 @@
+stages:
+  -build
+  -deploy
+  # -test
+image: node:20.12.2
+
+# default:
+#   image: maven:3.8.3-openjdk-17
+# build du projet
+build job:
+  cache:
+    paths:
+      - node_modules/
+  stage: build
+  script:
+    - npm cache clean --force
+    - npm install -f
+    - npm run build
+    - mkdir -p artifact
+    - ls dist/web2-typescript/browser/
+    - mv dist/web2-typescript/browser/* artifact/
+    - ls artifact/
+
+  artifacts:
+    paths:
+      - artifact
+  only:
+    - main
+# Mise a jour de l'execution TU
+test job:
+  stage: test
+  script:
+  # - docker build -t
+    # - npm test
+    - echo "hello @all iam DiagSpring"
+# Mise en place un job deploy
+deploy job:
+  stage: deploy
+  image: docker:latest
+  services:
+    - docker:dind
+  script:
+  - docker build -t $DOCKER_HUB_USER/web-front-end-angular:0.0.1 .
+  - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_TOKEN
+  - docker push $DOCKER_HUB_USER/web-front-end-angular:0.0.1
+  - docker image ls
+
+  when: mauel
+  # ls dist/web2-typescript/browser/, ls artifact/ : cest pour juste savoir le contenu

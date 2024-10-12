@@ -1,0 +1,10 @@
+services:
+  front:
+    image: web-front:1.0.0
+    container_name: container-web-front
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - 8082:80
+#docker compose up -d
